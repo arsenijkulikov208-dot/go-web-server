@@ -72,7 +72,7 @@ func loggingMiddleware(logger *slog.Logger, next http.Handler) http.Handler {
 func handleCreateComment(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if _, err := strconv.Atoi(id); err != nil {
-		logger.Warn("некорректный id в URL", "bad_id", id, "error", err)
+		logger.Warn("Invalid id in URL", "bad_id", id, "error", err)
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
@@ -88,13 +88,13 @@ func handleCreateComment(w http.ResponseWriter, r *http.Request) {
 	dec.DisallowUnknownFields() 
 
 	if err := dec.Decode(&input); err != nil {
-		logger.Warn("ошибка парсинга входящего JSON", "error", err)
+		logger.Warn("error parsing incoming JSON", "error", err)
 		http.Error(w, "invalid json body or unknown fields", http.StatusBadRequest)
 		return
 	}
 
 
-	logger.Debug("данные комментария успешно получены", "name", input.Name, "email", input.Email)
+	logger.Debug("comment data received successfully", "name", input.Name, "email", input.Email)
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(`{"status":"success"}`))
 }
@@ -121,10 +121,10 @@ func main() {
 		MaxHeaderBytes: 1 << 20,          
 	}
 
-	logger.Info("запуск сервера", "addr", srv.Addr)
+	logger.Info("starting the server", "addr", srv.Addr)
 
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Error("критическая ошибка сервера", "error", err)
+		logger.Error("critical server error", "error", err)
 		os.Exit(1)
 	}
 }
